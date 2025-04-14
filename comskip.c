@@ -9222,6 +9222,16 @@ FILE* LoadSettings(int argc, char ** argv)
             printf("inbasename= %s\n", inbasename);
             printf("dvr_dir= %s\n", dvr_dir);
             printf("File not located in DVR directory, exiting...\n");
+
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+            fclose(edl_file);
+
             exit (0);
         }
     }
