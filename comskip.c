@@ -9219,7 +9219,7 @@ FILE* LoadSettings(int argc, char ** argv)
     {
         printf("inbasename= %s\n", inbasename);
         printf("dvr_dir= %s\n", dvr_dir);
-        if (strstr(inbasename, dvr_dir) == NULL);
+        if (strstr(inbasename, dvr_dir) == NULL)
         {
             printf("File not located in DVR directory, exiting...\n");
             exit (0);
