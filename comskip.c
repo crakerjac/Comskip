@@ -9154,46 +9154,6 @@ FILE* LoadSettings(int argc, char ** argv)
         strcpy(workbasename, inbasename);
     }
 
-    if (dvr_dir)
-    {
-        printf("outputdirname= %s\n", outputdirname);
-        printf("dvr_dir= %s\n", dvr_dir);
-        if (strstr(outputdirname, dvr_dir) == NULL);
-        {
-            printf("File not located in DVR directory, exiting...\n");
-            //exit (0);
-        }
-    }
-
-    if (use_edl_plex)
-    {
-        sprintf(filename, "%s.edl.plex", outbasename);
-        edl_plex_file = myfopen(filename, "rb");
-        if (edl_plex_file)
-        {
-            sprintf(filename, "%s.edl", outbasename);
-            edl_file = myfopen(filename, "wb");
-            if (!edl_file)
-            {
-                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
-                exit(6);
-            }
-
-            /* copy edl.plex to edl file and close both */
-            char buffer[4096];
-            size_t bytes_read;
-            while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
-                fwrite(buffer, 1, bytes_read, edl_file);
-            }
-
-            fclose(edl_plex_file);
-            fclose(edl_file);
-
-            // Assume if edl.plex exists, then commercials were found.
-            exit (1);
-        }
-    }
-
     if (out->count)
     {
         sprintf(outputdirname, "%s", out->filename[0]);
@@ -9254,6 +9214,46 @@ FILE* LoadSettings(int argc, char ** argv)
 
     //	if (!loadingTXT)
     LoadIniFile();
+
+    if (dvr_dir)
+    {
+        printf("outputdirname= %s\n", outputdirname);
+        printf("dvr_dir= %s\n", dvr_dir);
+        if (strstr(outputdirname, dvr_dir) == NULL);
+        {
+            printf("File not located in DVR directory, exiting...\n");
+            //exit (0);
+        }
+    }
+
+    if (use_edl_plex)
+    {
+        sprintf(filename, "%s.edl.plex", outbasename);
+        edl_plex_file = myfopen(filename, "rb");
+        if (edl_plex_file)
+        {
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+
+            /* copy edl.plex to edl file and close both */
+            char buffer[4096];
+            size_t bytes_read;
+            while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
+                fwrite(buffer, 1, bytes_read, edl_file);
+            }
+
+            fclose(edl_plex_file);
+            fclose(edl_file);
+
+            // Assume if edl.plex exists, then commercials were found.
+            exit (1);
+        }
+    }
 
 //	live_tv = true;
 
