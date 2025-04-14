@@ -9218,6 +9218,8 @@ FILE* LoadSettings(int argc, char ** argv)
     if (dvr_dir)
     {
         printf("outputdirname= %s\n", outputdirname);
+        printf("inbasename= %s\n", inbasename);
+        printf("cl_work= %s\n", cl_work);
         printf("dvr_dir= %s\n", dvr_dir);
         if (strstr(outputdirname, dvr_dir) == NULL);
         {
