@@ -9215,14 +9215,14 @@ FILE* LoadSettings(int argc, char ** argv)
     //	if (!loadingTXT)
     LoadIniFile();
 
-    if (dvr_dir)
+    if ((dvr_dir) && (dvr_dir[0] != NULL))
     {
         printf("inbasename= %s\n", inbasename);
         printf("dvr_dir= %s\n", dvr_dir);
         if (strstr(inbasename, dvr_dir) == NULL);
         {
             printf("File not located in DVR directory, exiting...\n");
-            //exit (0);
+            exit (0);
         }
     }
 
