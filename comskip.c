@@ -6224,12 +6224,12 @@ void OpenOutputFiles()
     {
         sprintf(filename, "%s.edl", outbasename);
         //edl_file = myfopen(filename, "wb");
-        if (!edl_file)
-        {
-            fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
-            exit(6);
-        }
-        else
+        // if (!edl_file)
+        // {
+        //     fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+        //     exit(6);
+        // }
+        // else
         {
             output_edl = true;
         }
