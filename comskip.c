@@ -6251,7 +6251,11 @@ void OpenOutputFiles()
             }
 
             /* copy edl.plex to edl file and close both */
-            fcopy(edl_plex_file, edl_file);
+            char buffer[4096];
+            size_t bytes_read;
+            while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
+                fwrite(buffer, 1, bytes_read, edl_file);
+            }
 
             fclose(edl_plex_file);
             fclose(edl_file);
