@@ -103,6 +103,7 @@ FILE*			videoredo_file = NULL;
 FILE*			videoredo3_file = NULL;
 FILE*			btv_file = NULL;
 FILE*			edl_file = NULL;
+FILE*           edl_plex_file = NULL;
 FILE*			ffmeta_file = NULL;
 FILE*			ffsplit_file = NULL;
 FILE*			live_file = NULL;
