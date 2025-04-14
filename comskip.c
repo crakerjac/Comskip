@@ -8690,7 +8690,7 @@ void LoadIniFile()
         if ((tmp = FindNumber(data, "videoredo_offset=", (double) videoredo_offset)) != -1) videoredo_offset = (int) tmp;
         if ((tmp = FindNumber(data, "output_btv=", (double) output_btv)) > -1) output_btv = (bool) tmp;
         if ((tmp = FindNumber(data, "output_edl=", (double) output_edl)) > -1) output_edl = (bool) tmp;
-        if ((tmp = FindNumber(data, "output_edl_plex=", (double) output_edl_plex)) > -1) output_edl_plex = (bool) tmp;
+        if ((tmp = FindNumber(data, "use_edl_plex=", (double) use_edl_plex)) > -1) use_edl_plex = (bool) tmp;
         if ((tmp = FindNumber(data, "output_live=", (double) output_live)) > -1) output_live = (bool) tmp;
         if ((tmp = FindNumber(data, "edl_offset=", (double) edl_offset)) != -1) edl_offset = (int) tmp;
         if ((tmp = FindNumber(data, "timeline_repair=", (double) timeline_repair)) != -1) timeline_repair = (int) tmp;
@@ -9156,8 +9156,8 @@ FILE* LoadSettings(int argc, char ** argv)
 
     if (dvr_dir)
     {
-        fprintf("outputdirname= %s", outputdirname);
-        fprintf("dvr_dir= %s", dvr_dir);
+        printf("outputdirname= %s", outputdirname);
+        printf("dvr_dir= %s", dvr_dir);
         if (strstr(outputdirname, dvr_dir) == NULL);
         {
             printf("File not located in DVR directory, exiting...");
