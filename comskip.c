@@ -9156,12 +9156,12 @@ FILE* LoadSettings(int argc, char ** argv)
 
     if (dvr_dir)
     {
-        printf("outputdirname= %s", outputdirname);
-        printf("dvr_dir= %s", dvr_dir);
+        printf("outputdirname= %s\n", outputdirname);
+        printf("dvr_dir= %s\n", dvr_dir);
         if (strstr(outputdirname, dvr_dir) == NULL);
         {
-            printf("File not located in DVR directory, exiting...");
-            exit (0);
+            printf("File not located in DVR directory, exiting...\n");
+            //exit (0);
         }
     }
 
