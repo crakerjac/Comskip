@@ -646,6 +646,7 @@ int					edl_offset = 0;
 int                 timeline_repair = 1;
 int                 edl_skip_field = 0;
 bool				output_edl = false;
+bool                use_edl_plex = false;
 bool				output_live = false;
 bool				output_edlp = false;
 bool				output_bsplayer = false;
@@ -657,6 +658,7 @@ char				cuttermaran_options[1024];
 char				mpeg2schnitt_options[1024];
 char				avisynth_options[1024];
 char				dvrcut_options[1024];
+char                dvr_dir[1024];
 bool				output_demux = false;
 bool				output_data = false;
 bool				output_srt = false;
@@ -6225,7 +6227,7 @@ void OpenOutputFiles()
     {
         sprintf(filename, "%s.edl.plex", outbasename);
         edl_plex_file = myfopen(filename, "rb");
-        if (!edl_plex_file)
+        if ((!edl_plex_file) || (use_edl_plex == false))
         {
             /* edl.plex doesn't exist, follow normal process */
             sprintf(filename, "%s.edl", outbasename);
@@ -6250,19 +6252,15 @@ void OpenOutputFiles()
                 exit(6);
             }
 
-            printf(".edl.plex found.  Copying.\n");
             /* copy edl.plex to edl file and close both */
             char buffer[4096];
             size_t bytes_read;
             while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
                 fwrite(buffer, 1, bytes_read, edl_file);
             }
-            printf(".edl.plex copied.\n");
 
             fclose(edl_plex_file);
-            printf(".edl.plex closed.\n");
             fclose(edl_file);
-            printf(".edl closed.\n");
             //output_edl = false;
 
             // Assume if edl.plex exists, then commercials were found.
@@ -8692,6 +8690,7 @@ void LoadIniFile()
         if ((tmp = FindNumber(data, "videoredo_offset=", (double) videoredo_offset)) != -1) videoredo_offset = (int) tmp;
         if ((tmp = FindNumber(data, "output_btv=", (double) output_btv)) > -1) output_btv = (bool) tmp;
         if ((tmp = FindNumber(data, "output_edl=", (double) output_edl)) > -1) output_edl = (bool) tmp;
+        if ((tmp = FindNumber(data, "output_edl_plex=", (double) output_edl_plex)) > -1) output_edl_plex = (bool) tmp;
         if ((tmp = FindNumber(data, "output_live=", (double) output_live)) > -1) output_live = (bool) tmp;
         if ((tmp = FindNumber(data, "edl_offset=", (double) edl_offset)) != -1) edl_offset = (int) tmp;
         if ((tmp = FindNumber(data, "timeline_repair=", (double) timeline_repair)) != -1) timeline_repair = (int) tmp;
@@ -8751,6 +8750,7 @@ void LoadIniFile()
         if ((ts = FindString(data, "mpeg2schnitt_options=", mpeg2schnitt_options)) != 0) strcpy(mpeg2schnitt_options,ts);
         if ((ts = FindString(data, "avisynth_options=", avisynth_options)) != 0) strcpy(avisynth_options,ts);
         if ((ts = FindString(data, "dvrcut_options=", dvrcut_options)) != 0) strcpy(dvrcut_options,ts);
+        if ((ts = FindString(data, "dvr_dir=", dvr_dir)) != 0) strcpy(dvr_dir,ts);
         AddIniString("[Sage Workarounds]\n");
         if ((tmp = FindNumber(data, "sage_framenumber_bug=", (double) sage_framenumber_bug)) > -1) sage_framenumber_bug = (bool) tmp;
         if ((tmp = FindNumber(data, "sage_minute_bug=", (double) sage_minute_bug)) > -1) sage_minute_bug = (bool) tmp;
@@ -9154,6 +9154,45 @@ FILE* LoadSettings(int argc, char ** argv)
         strcpy(workbasename, inbasename);
     }
 
+    if (dvr_dir)
+    {
+        fprintf("outputdirname= %s", outputdirname);
+        fprintf("dvr_dir= %s", dvr_dir);
+        if (strstr(outputdirname, dvr_dir) == NULL);
+        {
+            fprintf("File not located in DVR directory, exiting...");
+            exit (0);
+        }
+    }
+
+    if (use_edl_plex)
+    {
+        sprintf(filename, "%s.edl.plex", outbasename);
+        edl_plex_file = myfopen(filename, "rb");
+        if (edl_plex_file)
+        {
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+
+            /* copy edl.plex to edl file and close both */
+            char buffer[4096];
+            size_t bytes_read;
+            while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
+                fwrite(buffer, 1, bytes_read, edl_file);
+            }
+
+            fclose(edl_plex_file);
+            fclose(edl_file);
+
+            // Assume if edl.plex exists, then commercials were found.
+            exit (1);
+        }
+    }
 
     if (out->count)
     {
