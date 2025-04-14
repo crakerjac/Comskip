@@ -6250,19 +6250,19 @@ void OpenOutputFiles()
                 exit(6);
             }
 
-            fprintf(".edl.plex found.  Copying.\n");
+            printf(".edl.plex found.  Copying.\n");
             /* copy edl.plex to edl file and close both */
             char buffer[4096];
             size_t bytes_read;
             while ((bytes_read = fread(buffer, 1, sizeof(buffer), edl_plex_file)) > 0) {
                 fwrite(buffer, 1, bytes_read, edl_file);
             }
-            fprintf(".edl.plex copied.\n");
+            printf(".edl.plex copied.\n");
 
             fclose(edl_plex_file);
-            fprintf(".edl.plex closed.\n");
+            printf(".edl.plex closed.\n");
             fclose(edl_file);
-            fprintf(".edl closed.\n");
+            printf(".edl closed.\n");
             output_edl = false;
         }
     }
