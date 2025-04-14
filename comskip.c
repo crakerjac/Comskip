@@ -9160,7 +9160,7 @@ FILE* LoadSettings(int argc, char ** argv)
         fprintf("dvr_dir= %s", dvr_dir);
         if (strstr(outputdirname, dvr_dir) == NULL);
         {
-            fprintf("File not located in DVR directory, exiting...");
+            printf("File not located in DVR directory, exiting...");
             exit (0);
         }
     }
