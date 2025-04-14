@@ -6222,16 +6222,39 @@ void OpenOutputFiles()
 
     if (output_edl)
     {
-        sprintf(filename, "%s.edl", outbasename);
-        //edl_file = myfopen(filename, "wb");
-        // if (!edl_file)
-        // {
-        //     fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
-        //     exit(6);
-        // }
-        // else
+        sprintf(filename, "%s.edl.plex", outbasename);
+        edl_plex_file = myfopen(filename, "rb");
+        if (!edl_plex_file)
         {
-            output_edl = true;
+            /* edl.plex doesn't exist, follow normal process */
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+            else
+            {
+                output_edl = true;
+            }
+        }
+        else
+        {
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+
+            /* copy edl.plex to edl file and close both */
+            fcopy(edl_plex_file, edl_file);
+
+            fclose(edl_plex_file);
+            fclose(edl_file);
+            output_edl = false;
         }
     }
 
@@ -6979,23 +7002,23 @@ void OutputCommercialBlock(int i, long prev, long start, long end, bool last)
     }
     CLOSEOUTFILE(btv_file);
 
-    // if (edl_file && prev < start /* &&!last */ && end - start > 2)
-    // {
-    //     if (start < 5)
-    //         start = 0;
-    //     s_start = max(start-edl_offset,0);
-    //     s_end = max(end - edl_offset,0);
+    if (edl_file && prev < start /* &&!last */ && end - start > 2)
+    {
+        if (start < 5)
+            start = 0;
+        s_start = max(start-edl_offset,0);
+        s_end = max(end - edl_offset,0);
 
-    //     if (demux_pid && enable_mencoder_pts)
-    //     {
-    //         fprintf(edl_file, "%.2f\t%.2f\t%d\n", get_frame_pts(s_start) + F2T(1), get_frame_pts(s_end) + F2T(1), edl_skip_field);
-    //     }
-    //     else
-    //     {
-    //         fprintf(edl_file, "%.2f\t%.2f\t%d\n", get_frame_pts(s_start), get_frame_pts(s_end), edl_skip_field);
-    //     }
-    // }
-    // CLOSEOUTFILE(edl_file);
+        if (demux_pid && enable_mencoder_pts)
+        {
+            fprintf(edl_file, "%.2f\t%.2f\t%d\n", get_frame_pts(s_start) + F2T(1), get_frame_pts(s_end) + F2T(1), edl_skip_field);
+        }
+        else
+        {
+            fprintf(edl_file, "%.2f\t%.2f\t%d\n", get_frame_pts(s_start), get_frame_pts(s_end), edl_skip_field);
+        }
+    }
+    CLOSEOUTFILE(edl_file);
 
     if (live_file && prev < start /* &&!last */ && end - start > 2)
     {
@@ -16114,11 +16137,11 @@ void BuildCommListAsYouGo(void)
             if (output_edl)
             {
                 sprintf(filename, "%s.edl", outbasename);
-                // edl_file = myfopen(filename, "wb");
+                edl_file = myfopen(filename, "wb");
                 if (!edl_file)
                 {
-                    // Sleep(50L);
-                    // edl_file = myfopen(filename, "wb");
+                    Sleep(50L);
+                    edl_file = myfopen(filename, "wb");
                     if (!edl_file)
                     {
                         Debug(0, "ERROR writing to %s\n", filename);
@@ -16227,8 +16250,8 @@ void BuildCommListAsYouGo(void)
 
                     if (out_file)
                         fprintf(out_file, "%li\t%li\n", c_start[i] + padding, c_end[i] - padding);
-                    // if (edl_file)
-                    //     fprintf(edl_file, "%.2f\t%.2f\t%d\n", (double) max(c_start[i] + padding - edl_offset,0) / fps , (double) max(c_end[i] - padding - edl_offset,0) / fps, edl_skip_field );
+                    if (edl_file)
+                        fprintf(edl_file, "%.2f\t%.2f\t%d\n", (double) max(c_start[i] + padding - edl_offset,0) / fps , (double) max(c_end[i] - padding - edl_offset,0) / fps, edl_skip_field );
                     if (live_file)
                         fprintf(live_file, "%.2f\t%.2f\t%d\n", (double) max(c_start[i] + padding - edl_offset,0) / fps , (double) max(c_end[i] - padding - edl_offset,0) / fps, edl_skip_field );
                     if (dvrmstb_file)
@@ -16238,8 +16261,8 @@ void BuildCommListAsYouGo(void)
             if (out_file) fflush(out_file);
             if (out_file) fclose(out_file);
             out_file = 0;
-            // if (edl_file) fflush(edl_file);
-            // if (edl_file) fclose(edl_file);
+            if (edl_file) fflush(edl_file);
+            if (edl_file) fclose(edl_file);
             edl_file = 0;
             if (live_file) fflush(live_file);
             if (live_file) fclose(live_file);
