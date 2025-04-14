@@ -6263,7 +6263,10 @@ void OpenOutputFiles()
             printf(".edl.plex closed.\n");
             fclose(edl_file);
             printf(".edl closed.\n");
-            output_edl = false;
+            //output_edl = false;
+
+            // Assume if edl.plex exists, then commercials were found.
+            exit (1);
         }
     }
 
