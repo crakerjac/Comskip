@@ -647,6 +647,7 @@ int                 timeline_repair = 1;
 int                 edl_skip_field = 0;
 bool				output_edl = false;
 bool                use_edl_plex = false;
+bool                skip_new_processing = false;
 bool				output_live = false;
 bool				output_edlp = false;
 bool				output_bsplayer = false;
@@ -8691,6 +8692,7 @@ void LoadIniFile()
         if ((tmp = FindNumber(data, "output_btv=", (double) output_btv)) > -1) output_btv = (bool) tmp;
         if ((tmp = FindNumber(data, "output_edl=", (double) output_edl)) > -1) output_edl = (bool) tmp;
         if ((tmp = FindNumber(data, "use_edl_plex=", (double) use_edl_plex)) > -1) use_edl_plex = (bool) tmp;
+        if ((tmp = FindNumber(data, "skip_new_processing=", (double) skip_new_processing)) > -1) skip_new_processing = (bool) tmp;
         if ((tmp = FindNumber(data, "output_live=", (double) output_live)) > -1) output_live = (bool) tmp;
         if ((tmp = FindNumber(data, "edl_offset=", (double) edl_offset)) != -1) edl_offset = (int) tmp;
         if ((tmp = FindNumber(data, "timeline_repair=", (double) timeline_repair)) != -1) timeline_repair = (int) tmp;
@@ -9215,27 +9217,6 @@ FILE* LoadSettings(int argc, char ** argv)
     //	if (!loadingTXT)
     LoadIniFile();
 
-    if ((dvr_dir) && (dvr_dir[0] != NULL))
-    {
-        if (strstr(inbasename, dvr_dir) == NULL)
-        {
-            printf("inbasename= %s\n", inbasename);
-            printf("dvr_dir= %s\n", dvr_dir);
-            printf("File not located in DVR directory, exiting...\n");
-
-            sprintf(filename, "%s.edl", outbasename);
-            edl_file = myfopen(filename, "wb");
-            if (!edl_file)
-            {
-                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
-                exit(6);
-            }
-            fclose(edl_file);
-
-            exit (0);
-        }
-    }
-
     if (use_edl_plex)
     {
         sprintf(filename, "%s.edl.plex", outbasename);
@@ -9262,6 +9243,29 @@ FILE* LoadSettings(int argc, char ** argv)
 
             // Assume if edl.plex exists, then commercials were found.
             exit (1);
+        }
+    }
+
+    // Only use skip_new_processing when use_edl_plex is enabled.  This allows Plex version x
+    // skip_new_processing to only process edl files previously generated (e.g. KMTTG from TiVo)
+    if (((dvr_dir) && (dvr_dir[0] != NULL)) || (skip_new_processing))
+    {
+        if ((strstr(inbasename, dvr_dir) == NULL) || (skip_new_processing))
+        {
+            //printf("inbasename= %s\n", inbasename);
+            //printf("dvr_dir= %s\n", dvr_dir);
+            //printf("File not located in DVR directory, exiting...\n");
+
+            sprintf(filename, "%s.edl", outbasename);
+            edl_file = myfopen(filename, "wb");
+            if (!edl_file)
+            {
+                fprintf(stderr, "%s - could not create file %s\n", strerror(errno), filename);
+                exit(6);
+            }
+            fclose(edl_file);
+
+            exit (0);
         }
     }
 
